@@ -72,7 +72,7 @@ module.exports = (io) => {
                 });
 
                 // 2. Emit to others in room (Receiver)
-                socket.to(`conversation:${conversationId}`).emit('msg:new', message);
+                socket.to(`conversation:${conversationId}`).emit('new_message', message);
 
                 // 3. Emit notification to specific participants (for unread counts/list updates)
                 const participants = await Conversation.getParticipants(conversationId);
