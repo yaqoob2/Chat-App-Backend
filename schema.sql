@@ -22,9 +22,10 @@ CREATE TABLE IF NOT EXISTS conversations (
 );
 
 CREATE TABLE IF NOT EXISTS conversation_participants (
+  id INT AUTO_INCREMENT PRIMARY KEY,
   conversation_id INT,
   user_id INT,
-  PRIMARY KEY (conversation_id, user_id),
+  UNIQUE(conversation_id, user_id),
   FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
