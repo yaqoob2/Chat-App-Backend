@@ -54,14 +54,25 @@ exports.sendMessage = async (req, res) => {
     const { conversationId, content, type } = req.body;
 
     try {
-        const message = await Message.create({
+        // For file types (image/video/file/audio), content contains the URL
+        // We should store it in both content and fileUrl for backward compatibility
+        const messageData = {
             conversationId,
             senderId: req.user.id,
-            content,
             type
-        });
+        };
 
-        // Emit socket event
+        // If it's a file-based message, store URL in fileUrl field
+        if (['image', 'video', 'file', 'audio'].includes(type)) {
+            messageData.fileUrl = content;
+            messageData.content = null; // Optional: can store filename or null
+        } else {
+            messageData.content = content;
+            messageData.fileUrl = null;
+        }
+
+        const message = await Message.create(messageData);
+
         // Emit socket event
         const io = req.app.get('io');
         if (io) {
@@ -89,7 +100,7 @@ exports.sendMessage = async (req, res) => {
 
         res.json(message);
     } catch (err) {
-        console.error(err);
+        console.error('Error sending message:', err);
         res.status(500).json({ error: 'Server error' });
     }
 };

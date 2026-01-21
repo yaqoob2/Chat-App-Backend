@@ -42,7 +42,13 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Middleware
-app.use(cors({ origin: process.env.FRONTEND_URL }));
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -79,12 +85,22 @@ app.get('/', (req, res) => {
 });
 
 // 404 handler
-app.use((req, res) => {
+app.use((req, res, next) => {
     console.log(`⚠️  404 - Route not found: ${req.method} ${req.url}`);
     res.status(404).json({
         error: 'Route not found',
         requested: `${req.method} ${req.url}`,
         availableRoutes: ['/api/auth', '/api/chat', '/api/calls']
+    });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('🔥 Unhandled Error:', err);
+    res.status(500).json({
+        error: 'Internal Server Error',
+        message: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
 });
 

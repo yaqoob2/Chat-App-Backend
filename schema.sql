@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS messages (
   sender_id INT NOT NULL,
   content TEXT,
   file_url VARCHAR(255),
-  type ENUM('text', 'image', 'video', 'file') DEFAULT 'text',
+  type ENUM('text', 'image', 'video', 'file', 'audio') DEFAULT 'text',
   is_read BOOLEAN DEFAULT FALSE,
   status ENUM('sent', 'delivered', 'read') DEFAULT 'sent',
   delivered_at TIMESTAMP NULL,
